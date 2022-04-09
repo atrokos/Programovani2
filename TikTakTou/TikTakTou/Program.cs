@@ -13,7 +13,7 @@ namespace tictactoe
             bool whichOne; // If true, P1 plays, otherwise P2 plays
             bool continueGame = true;
 
-            public TurnManager(Player p1, AI p2, Board board)
+            public TurnManager(Player p1, AI p2, Board board) // For interactive mode; one human, one AI
             {
                 P1 = p1;
                 P2 = p2;
@@ -24,7 +24,7 @@ namespace tictactoe
                     whichOne = false;
             }
 
-            public TurnManager(AI p2, AI p3, Board board, bool whichone)
+            public TurnManager(AI p2, AI p3, Board board, bool whichone) // For analytical mode; two AIs
             {
                 whichOne = whichone;
                 P2 = p2;
@@ -45,7 +45,7 @@ namespace tictactoe
 
             void PlayersTurn()
             {
-                Console.WriteLine("Player's turn:");
+                Console.WriteLine("Your turn:");
                 while (true)
                 {
                     string[] Move = Console.ReadLine().Split(',');
@@ -90,6 +90,7 @@ namespace tictactoe
                 }
                 else
                 {
+                    Console.WriteLine("The opponent plays:");
                     AIsTurn(P2);
                     if (board.EvaluateBoard(P1) == -10)
                     {
@@ -106,21 +107,14 @@ namespace tictactoe
         {
             readonly string sign; // x or o
             readonly string opponent; // Opponent's sign
-            bool isAI; // Whether it is controlled by the AI
 
-            public Player(string sign, bool isAI)
+            public Player(string sign)
             {
-                this.isAI = isAI;
                 this.sign = sign;
                 if (sign == "x")
                     this.opponent = "o";
                 else
                     this.opponent = "x";
-            }
-
-            public bool AreYouAI()
-            {
-                return isAI;
             }
 
             public string Sign()
@@ -136,7 +130,7 @@ namespace tictactoe
 
         class Printer
         {
-            Board board;
+            readonly Board board;
 
             public Printer(Board board)
             {
@@ -268,9 +262,9 @@ namespace tictactoe
             public Board CreateBoard()
             {
                 string[,] board = new string[3,3];
-                for (int i = 0; i < board.GetLength(0); i++)
+                for (int i = 0; i < 3; i++)
                 {
-                    for (int j = 0; j < board.GetLength(1); j++)
+                    for (int j = 0; j < 3; j++)
                     {
                         board[i,j] = ReadLetter();
                     }
@@ -295,20 +289,15 @@ namespace tictactoe
 
             public bool AnyMovesLeft()
             {
-                for (int i = 0; i < board.GetLength(0); i++)
+                for (int i = 0; i < 3; i++)
                 {
-                    for (int j = 0; j < board.GetLength(1); j++)
+                    for (int j = 0; j < 3; j++)
                     {
                         if (board[i,j] == ".")
                             return true;
                     }
                 }
                 return false;
-            }
-
-            public string[,] GetWholeBoard()
-            {
-                return board;
             }
 
             public string GetTile(int h, int w)
@@ -381,6 +370,8 @@ namespace tictactoe
         {
             string input = Console.ReadLine(), opponentsign = "o";
             bool interactive = false;
+
+            // If there the first input is not a number, switch to interactive mode + set the players' signs
             if (! int.TryParse(input, out int numberofplays))
             {
                 interactive = true;
@@ -390,24 +381,38 @@ namespace tictactoe
                 }
             }
 
-            if (interactive)
+            if (interactive) // Interactive mode
             {
-                Console.WriteLine("The goal of reverse Tic-Tac-Toe is to NOT form a Tic-Tac-Toe.\nTo place your sign, write the coordinates like this: 'x,y', where 'x' is a column number and y is a row number.\nBoth are in range [1,3].");
-                Player player1 = new(input, false);
-                Player player2 = new(opponentsign, true);
+                Console.WriteLine("The goal of reverse Tic-Tac-Toe is to NOT form a Tic-Tac-Toe.\nTo place your sign, write the coordinates like this: 'x,y', where 'x' is the column's number and 'y' is the row's number.\nBoth are in range [1,3].");
+                
+                // Initialize all needed objects
+                Player player1 = new(input);
+                Player player2 = new(opponentsign);
                 Board gameBoard = new Board();
                 AI opponent = new(player2, gameBoard);
                 TurnManager manager = new(player1, opponent, gameBoard);
                 Printer printer = new(gameBoard);
+
+                // The game plays until there are no moves left or one of the players won
                 while (gameBoard.AnyMovesLeft() && manager.Continue())
                 {
                     printer.PrintBoard();
                     Console.WriteLine();
                     manager.ProgressGame();
                 }
+
+                // Prints the match's result
                 if (gameBoard.EvaluateBoard(player1) == 0)
                 {
                     Console.WriteLine("It's a draw!");
+                }
+                else if (gameBoard.EvaluateBoard(player1) == 10)
+                {
+                    Console.WriteLine("Player 1 wins!");
+                }
+                else if (gameBoard.EvaluateBoard(player2) == 10)
+                {
+                    Console.WriteLine("Player 2 wins!");
                 }
             }
             else // Analytical mode
@@ -418,6 +423,8 @@ namespace tictactoe
                 for (int n = 0; n < numberofplays; n++)
                 {
                     Board gameBoard = loader.CreateBoard();
+
+                    // Decide if X or O starts
                     int noOfX = 0, noOfO = 0;
                     for (int i = 0; i < 3; i++)
                     {
@@ -430,19 +437,12 @@ namespace tictactoe
                         }
                     }
 
-                    //Decide if x or o starts
-                    bool whichone = false;
-                    if (noOfX == noOfO)
-                    {
-                        whichone = true;
-                    }
-
                     // Initialize all needed objects
-                    Player player1 = new("x", true);
-                    Player player2 = new("o", true);
+                    Player player1 = new("x");
+                    Player player2 = new("o");
                     AI ai1 = new(player1, gameBoard);
                     AI ai2 = new(player2, gameBoard);
-                    TurnManager manager = new(ai1, ai2, gameBoard, whichone);
+                    TurnManager manager = new(ai1, ai2, gameBoard, noOfX == noOfO);
 
                     // Simulate the game
                     while (gameBoard.AnyMovesLeft() && manager.Continue())
