@@ -6,10 +6,11 @@ namespace tictactoe
     {
         class TurnManager // Manages turns between the two players
         {
-            Player P1;
-            AI P2;
+            Player P1 = null;
+            AI P2 = null;
+            AI P3 = null;
             Board board;
-            bool whichOne; // If true, P1 plays, otherwise P2 plays
+            bool whichOne, continueGame = true; // If true, P1 plays, otherwise P2 plays
 
             public TurnManager(Player p1, AI p2, Board board)
             {
@@ -22,31 +23,77 @@ namespace tictactoe
                     whichOne = false;
             }
 
-            void AITurn()
+            public TurnManager(AI p3, AI p2, Board board)
             {
-                int[] Move = P2.Play();
-                board.ChangeTile(P2.GetPlayer().Sign(), Move[0], Move[1], false);
+
+                P2 = p2;
+                P3 = p3;
+                if (P2.GetPlayer().Sign() == "x")
+                    whichOne = true;
+                else
+                    whichOne = false;
+                this.board = board;
             }
 
-            void PlayerTurn()
+            void AIsTurn(AI ai)
+            {
+                int[] Move = ai.Play();
+                board.ChangeTile(ai.GetPlayer().Sign(), Move[0], Move[1], false);
+            }
+
+            public bool Continue()
+            {
+                return continueGame;
+            }
+
+            void PlayersTurn()
             {
                 Console.WriteLine("Player's turn:");
                 while (true)
                 {
                     string[] Move = Console.ReadLine().Split(',');
-                    if (board.ChangeTile(P1.Sign(), Convert.ToInt32(Move[0]) - 1, Convert.ToInt32(Move[1]) - 1, false))
+                    if (board.ChangeTile(P1.Sign(), int.Parse(Move[0]) - 1, int.Parse(Move[1]) - 1, false))
                         break;
                     else
                         Console.WriteLine("There already is a sign. Choose another one.");
                 }
             }
 
+            public void ProgressAIGame()
+            {
+                if (whichOne)
+                {
+                    AIsTurn(P2);
+                }
+                else
+                {
+                    AIsTurn(P3);
+                }
+
+                whichOne = !whichOne;
+            }
+
             public void ProgressGame()
             {
                 if (whichOne)
-                    PlayerTurn();
+                {
+                    PlayersTurn();
+                    if (board.EvaluateBoard(P1) == 10)
+                    {
+                        Console.WriteLine("Player 2 wins!");
+                        continueGame = false;
+                    }
+                }
                 else
-                    AITurn();
+                {
+                    AIsTurn(P2);
+                    if (board.EvaluateBoard(P1) == -10)
+                    {
+                        Console.WriteLine("Player 1 wins!");
+                        continueGame = false;
+                    }
+                }
+
                 whichOne = !whichOne;
             }
         }
@@ -352,7 +399,42 @@ namespace tictactoe
 
         static void Main(string[] args)
         {
-            
+            string input = Console.ReadLine(), opponentsign = "o";
+            bool interactive = false;
+            if (! int.TryParse(input, out int numberofplays))
+            {
+                interactive = true;
+                if (input == "o")
+                {
+                    opponentsign = "x";
+                }
+            }
+
+            if (interactive)
+            {
+                Console.WriteLine("The goal of reverse Tic-Tac-Toe is to NOT form a Tic-Tac-Toe.\nTo place your sign, write the coordinates like this: 'x,y', where 'x' is column number and y is row number.\nBoth are in range [1,3].");
+                Player player1 = new(input, false);
+                Player player2 = new(opponentsign, true);
+                Board gameBoard = new Board();
+                AI opponent = new(player2, gameBoard);
+                TurnManager manager = new(player1, opponent, gameBoard);
+                Printer printer = new(gameBoard);
+                while (gameBoard.AnyMovesLeft() && manager.Continue())
+                {
+                    printer.PrintBoard();
+                    Console.WriteLine();
+                    manager.ProgressGame();
+                }
+                if (gameBoard.EvaluateBoard(player1) == 0)
+                {
+                    Console.WriteLine("It's a draw!");
+                }
+            }
+            else
+            {
+                Loader loader = new();
+
+            }
         }
     }
 }
