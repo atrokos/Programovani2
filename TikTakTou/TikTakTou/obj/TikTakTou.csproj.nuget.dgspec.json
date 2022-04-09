@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\honza\\source\\repos\\TikTakTou\\TikTakTou\\TikTakTou.csproj": {}
+    "C:\\Users\\honza\\Source\\Repos\\Programovani2\\TikTakTou\\TikTakTou\\TikTakTou.csproj": {}
   },
   "projects": {
-    "C:\\Users\\honza\\source\\repos\\TikTakTou\\TikTakTou\\TikTakTou.csproj": {
+    "C:\\Users\\honza\\Source\\Repos\\Programovani2\\TikTakTou\\TikTakTou\\TikTakTou.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\honza\\source\\repos\\TikTakTou\\TikTakTou\\TikTakTou.csproj",
+        "projectUniqueName": "C:\\Users\\honza\\Source\\Repos\\Programovani2\\TikTakTou\\TikTakTou\\TikTakTou.csproj",
         "projectName": "TikTakTou",
-        "projectPath": "C:\\Users\\honza\\source\\repos\\TikTakTou\\TikTakTou\\TikTakTou.csproj",
+        "projectPath": "C:\\Users\\honza\\Source\\Repos\\Programovani2\\TikTakTou\\TikTakTou\\TikTakTou.csproj",
         "packagesPath": "C:\\Users\\honza\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\honza\\source\\repos\\TikTakTou\\TikTakTou\\obj\\",
+        "outputPath": "C:\\Users\\honza\\Source\\Repos\\Programovani2\\TikTakTou\\TikTakTou\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
