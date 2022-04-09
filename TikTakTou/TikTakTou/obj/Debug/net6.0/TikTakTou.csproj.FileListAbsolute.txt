@@ -1,0 +1,15 @@
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\bin\Debug\net6.0\TikTakTou.exe
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\bin\Debug\net6.0\TikTakTou.deps.json
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\bin\Debug\net6.0\TikTakTou.runtimeconfig.json
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\bin\Debug\net6.0\TikTakTou.dll
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\bin\Debug\net6.0\TikTakTou.pdb
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\obj\Debug\net6.0\TikTakTou.csproj.AssemblyReference.cache
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\obj\Debug\net6.0\TikTakTou.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\obj\Debug\net6.0\TikTakTou.AssemblyInfoInputs.cache
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\obj\Debug\net6.0\TikTakTou.AssemblyInfo.cs
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\obj\Debug\net6.0\TikTakTou.csproj.CoreCompileInputs.cache
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\obj\Debug\net6.0\TikTakTou.dll
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\obj\Debug\net6.0\refint\TikTakTou.dll
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\obj\Debug\net6.0\TikTakTou.pdb
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\obj\Debug\net6.0\TikTakTou.genruntimeconfig.cache
+C:\Users\honza\Source\Repos\Programovani2\TikTakTou\TikTakTou\obj\Debug\net6.0\ref\TikTakTou.dll
