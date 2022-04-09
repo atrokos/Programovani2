@@ -10,7 +10,8 @@ namespace tictactoe
             AI P2 = null;
             AI P3 = null;
             Board board;
-            bool whichOne, continueGame = true; // If true, P1 plays, otherwise P2 plays
+            bool whichOne; // If true, P1 plays, otherwise P2 plays
+            bool continueGame = true;
 
             public TurnManager(Player p1, AI p2, Board board)
             {
@@ -23,15 +24,11 @@ namespace tictactoe
                     whichOne = false;
             }
 
-            public TurnManager(AI p3, AI p2, Board board)
+            public TurnManager(AI p2, AI p3, Board board, bool whichone)
             {
-
+                whichOne = whichone;
                 P2 = p2;
                 P3 = p3;
-                if (P2.GetPlayer().Sign() == "x")
-                    whichOne = true;
-                else
-                    whichOne = false;
                 this.board = board;
             }
 
@@ -64,12 +61,19 @@ namespace tictactoe
                 if (whichOne)
                 {
                     AIsTurn(P2);
+                    if (board.EvaluateBoard(P2.GetPlayer()) == -10)
+                    {
+                        continueGame = false;
+                    }
                 }
                 else
                 {
                     AIsTurn(P3);
+                    if (board.EvaluateBoard(P3.GetPlayer()) == -10)
+                    {
+                        continueGame = false;
+                    }
                 }
-
                 whichOne = !whichOne;
             }
 
@@ -100,8 +104,8 @@ namespace tictactoe
 
         class Player
         {
-            string sign; // x or o
-            string opponent; // Opponent's sign
+            readonly string sign; // x or o
+            readonly string opponent; // Opponent's sign
             bool isAI; // Whether it is controlled by the AI
 
             public Player(string sign, bool isAI)
@@ -141,9 +145,9 @@ namespace tictactoe
 
             public void PrintBoard()
             {
-                for (int i = 0; i < board.GetHeight(); i++)
+                for (int i = 0; i < 3; i++)
                 {
-                    for (int j = 0; j < board.GetWidth(); j++)
+                    for (int j = 0; j < 3; j++)
                     {
                         Console.Write(board.GetTile(i, j));
                     }
@@ -165,20 +169,19 @@ namespace tictactoe
 
             int[] FindBestMove()
             {
-                int[] bestMove = new int[2] { -1, -1 };
-                int bestMoveValue = -1;
-                int currentMoveValue = -1;
-                for (int i = 0; i < board.GetHeight(); i++)
+                int[] bestMove = new int[2];
+                int bestMoveValue = -100;
+                for (int i = 0; i < 3; i++)
                 {
-                    for (int j = 0; j < board.GetWidth(); j++)
+                    for (int j = 0; j < 3; j++)
                     {
                         if (board.GetTile(i, j) == ".") // If the tile is empty, put your sign in it
                         {
                             board.ChangeTile(player.Sign(), i, j, false);
-                            currentMoveValue = Minimax(board, false, 0);
+                            int currentMoveValue = Minimax(board, false);
                             board.ChangeTile(".", i, j, true); // Remove the sign
 
-                            if (currentMoveValue < bestMoveValue || bestMoveValue == -1)
+                            if (currentMoveValue > bestMoveValue)
                             {
                                 bestMoveValue = currentMoveValue;
                                 bestMove[0] = i;
@@ -190,7 +193,7 @@ namespace tictactoe
                 return bestMove;
             }
 
-            int Minimax(Board board, bool Max, int depth) // Evaluate evalboard; Max = true for max's turn, false for min's turn
+            int Minimax(Board board, bool Max) // Evaluate board; Max = true for max's turn, false for min's turn
             {
                 int currentValue = board.EvaluateBoard(player);
                 if (currentValue == 10)
@@ -205,14 +208,14 @@ namespace tictactoe
                 if (Max)
                 {
                     int bestMove = -100;
-                    for (int i = 0; i < board.GetHeight(); i++)
+                    for (int i = 0; i < 3; i++)
                     {
-                        for (int j = 0; j < board.GetWidth(); j++)
+                        for (int j = 0; j < 3; j++)
                         {
                             if (board.GetTile(i,j) == ".") // If the tile is empty, put your sign in it
                             {
-                                board.ChangeTile(player.Opponent(), i, j, false);
-                                bestMove = Math.Max(bestMove, Minimax(board, !Max, depth+1));
+                                board.ChangeTile(player.Sign(), i, j, false);
+                                bestMove = Math.Max(bestMove, Minimax(board, !Max));
                                 board.ChangeTile(".", i, j, true); // Remove the sign
                             }
                         }
@@ -222,14 +225,14 @@ namespace tictactoe
                 else
                 {
                     int bestMove = 100;
-                    for (int i = 0; i < board.GetHeight(); i++)
+                    for (int i = 0; i < 3; i++)
                     {
-                        for (int j = 0; j < board.GetWidth(); j++)
+                        for (int j = 0; j < 3; j++)
                         {
                             if (board.GetTile(i, j) == ".") // If the tile is empty, put your opponent's sign in it
                             {
-                                board.ChangeTile(player.Sign(), i, j, false);
-                                bestMove = Math.Min(bestMove, Minimax(board, !Max, depth + 1));
+                                board.ChangeTile(player.Opponent(), i, j, false);
+                                bestMove = Math.Min(bestMove, Minimax(board, !Max));
                                 board.ChangeTile(".", i, j, true); // Remove the sign
                             }
                         }
@@ -240,8 +243,7 @@ namespace tictactoe
 
             public int[] Play()
             {
-                int[] Move = FindBestMove();
-                return Move;
+                return FindBestMove();
             }
 
             public Player GetPlayer()
@@ -263,19 +265,7 @@ namespace tictactoe
                 } while (true);
             }
 
-            int ReadNumber()
-            {
-                string line;
-                do
-                {
-                    line = Console.ReadLine();
-                    if (line != null)
-                        return Convert.ToInt32(line);
-                }
-                while (true);
-            }
-
-            Board CreateBoard()
+            public Board CreateBoard()
             {
                 string[,] board = new string[3,3];
                 for (int i = 0; i < board.GetLength(0); i++)
@@ -326,16 +316,6 @@ namespace tictactoe
                 return board[h, w];
             }
 
-            public int GetHeight()
-            {
-                return board.GetLength(0);
-            }
-
-            public int GetWidth()
-            {
-                return board.GetLength(1);
-            }
-
             public bool ChangeTile(string what, int h, int w, bool overwrite) //Changes tile at h,w coordinates to what; returns true if possible, false if not
             {
                 if (overwrite)
@@ -356,41 +336,41 @@ namespace tictactoe
 
             public int EvaluateBoard(Player player) // Evaluates board for ... tictactoe
             {
-                for (int i = 0; i < board.GetLength(0); i++) // vertical
+                for (int i = 0; i < 3; i++) // vertical
                 {
                     if (board[i, 0] == board[i, 1] && board[i, 1] == board[i, 2])
                     {
                         if (board[i, 0] == player.Sign()) // If there is the player's sign, return negative value
-                            return 10;
-                        else if (board[i, 0] == player.Opponent())
                             return -10;
+                        else if (board[i, 0] == player.Opponent())
+                            return 10;
                     }
                 }
 
-                for (int i = 0; i < board.GetLength(1); i++) // horizontal
+                for (int i = 0; i < 3; i++) // horizontal
                 {
                     if (board[0, i] == board[1, i] && board[1, i] == board[2, i])
                     {
                         if (board[0, i] == player.Sign())
-                            return 10;
-                        else if (board[0, i] == player.Opponent())
                             return -10;
+                        else if (board[0, i] == player.Opponent())
+                            return 10;
                     }
                 }
 
                 if (board[0, 0] == board[1, 1] && board[1, 1] == board[2, 2]) // diagonal \
                 {
                     if (board[0, 0] == player.Sign())
-                        return 10;
-                    else if (board[0, 0] == player.Opponent())
                         return -10;
+                    else if (board[0, 0] == player.Opponent())
+                        return 10;
                 }
                 else if (board[0, 2] == board[1, 1] && board[1, 1] == board[2, 0]) // diagonal /
                 {
                     if (board[0, 2] == player.Sign())
-                        return 10;
-                    else if (board[0, 2] == player.Opponent())
                         return -10;
+                    else if (board[0, 2] == player.Opponent())
+                        return 10;
                 }
                 return 0;
             }
@@ -412,7 +392,7 @@ namespace tictactoe
 
             if (interactive)
             {
-                Console.WriteLine("The goal of reverse Tic-Tac-Toe is to NOT form a Tic-Tac-Toe.\nTo place your sign, write the coordinates like this: 'x,y', where 'x' is column number and y is row number.\nBoth are in range [1,3].");
+                Console.WriteLine("The goal of reverse Tic-Tac-Toe is to NOT form a Tic-Tac-Toe.\nTo place your sign, write the coordinates like this: 'x,y', where 'x' is a column number and y is a row number.\nBoth are in range [1,3].");
                 Player player1 = new(input, false);
                 Player player2 = new(opponentsign, true);
                 Board gameBoard = new Board();
@@ -430,10 +410,82 @@ namespace tictactoe
                     Console.WriteLine("It's a draw!");
                 }
             }
-            else
+            else // Analytical mode
             {
+                string[] results = new string[numberofplays];
+                int resultPointer = 0;
                 Loader loader = new();
+                for (int n = 0; n < numberofplays; n++)
+                {
+                    Board gameBoard = loader.CreateBoard();
+                    int noOfX = 0, noOfO = 0;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        for (int j = 0; j < 3; j++)
+                        {
+                            if (gameBoard.GetTile(i, j) == "x")
+                                noOfX++;
+                            else if (gameBoard.GetTile(i, j) == "o")
+                                noOfO++;
+                        }
+                    }
 
+                    //Decide if x or o starts
+                    bool whichone = false;
+                    if (noOfX == noOfO)
+                    {
+                        whichone = true;
+                    }
+
+                    // Initialize all needed objects
+                    Player player1 = new("x", true);
+                    Player player2 = new("o", true);
+                    AI ai1 = new(player1, gameBoard);
+                    AI ai2 = new(player2, gameBoard);
+                    TurnManager manager = new(ai1, ai2, gameBoard, whichone);
+
+                    // Simulate the game
+                    while (gameBoard.AnyMovesLeft() && manager.Continue())
+                    {
+                        manager.ProgressAIGame();
+                    }
+
+                    //Evaluate the outcome and save it to results
+                    if (gameBoard.EvaluateBoard(player1) == 0)
+                    {
+                        results[resultPointer] = "N";
+                        resultPointer++;
+                    }
+                    else if (gameBoard.EvaluateBoard(player1) == 10)
+                    {
+                        if (player1.Sign() == "x")
+                        {
+                            results[resultPointer] = "X";
+                        }
+                        else
+                        {
+                            results[resultPointer] = "O";
+                        }
+                        resultPointer++;
+                    }
+                    else if ((gameBoard.EvaluateBoard(player2) == 10))
+                    {
+                        if (player2.Sign() == "x")
+                        {
+                            results[resultPointer] = "X";
+                        }
+                        else
+                        {
+                            results[resultPointer] = "O";
+                        }
+                        resultPointer++;
+                    }
+                }
+
+                for (int i = 0; i < results.Length; i++) // Print results
+                {
+                    Console.Write(results[i]);
+                }
             }
         }
     }
